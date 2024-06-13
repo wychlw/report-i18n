@@ -1,5 +1,8 @@
 env.py
+conf.py
 __pycache__
 processed_list.txt
 testdir/docs/
 .vscode/settings.json
+
+*.bak
