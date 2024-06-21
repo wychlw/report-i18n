@@ -8,7 +8,7 @@ from conf import *
 
 client = openai.OpenAI(
     api_key=os.environ.get("CHATGPT_API_KEY"),
-    base_url=os.environ.get("CHATGPT_API_BASE")
+    # base_url=os.environ.get("CHATGPT_API_BASE")
 )
 
 
@@ -45,13 +45,14 @@ def translate_text(paragraths, lang):
         #     messages=promote,
         # )
         completion = client.chat.completions.create(
-            model="gpt-3.5-turbo",
+            # model="gpt-3.5-turbo",
+            model="gpt-4o",
             messages=promote,
-            temperature=0,
-            max_tokens=4096,
-            top_p=1,
-            frequency_penalty=0,
-            presence_penalty=0
+            # temperature=0,
+            # max_tokens=4096,
+            # top_p=1,
+            # frequency_penalty=0,
+            # presence_penalty=0
         )
         promote.append({"role": "assistant", "content": completion.choices[0].message.content})
         output_text = completion.choices[0].message.content
@@ -172,7 +173,7 @@ try:
             sys.stdout.flush()
 
     with open(processed_list, "r", encoding="utf-8") as f:
-        processed_list_content = f.read()
+        processed_list_content = f.read().splitlines()
 
     # 遍历目录下的所有.md 文件，并进行翻译
     for input_file in sorted_file_list:
