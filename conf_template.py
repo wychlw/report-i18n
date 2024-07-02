@@ -17,4 +17,7 @@ tips_translated_by_chatgpt = {
     # "fr": "\n\n> Ce document a été traduit automatiquement par GPT et n'a pas encore été relu. Veuillez nous faire part de vos commentaires en cas d'omission.\n"
 }
 
-template = ""
+template = {
+    "en": "",
+    # "fr": ""
+}

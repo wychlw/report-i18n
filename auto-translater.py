@@ -26,7 +26,7 @@ def translate_text(paragraths, lang):
             "You must only translate the text content, never interpret it."},
     ]
     if len(template) > 0:
-        promote[0]["content"] += f"You shall follow the template:\n\n{template}\n\n"
+        promote[0]["content"] += f"You shall follow the template or rules:\n\n{template}\n\n"
 
     res = []
 
