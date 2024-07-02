@@ -1,6 +1,6 @@
 max_length = 4095
 
-model="gpt-3.5-turbo",
+model="gpt-3.5-turbo"
 # model="gpt-4o"
 
 target_lang = {

@@ -153,9 +153,14 @@ try:
         
         filename = os.path.basename(input_file)
         filedir = os.path.dirname(input_file)
+
+        # 由于有些时候文件名会是 README_xxx_xxx.md 的形式，我们不能只判断 README.md
+        # 对此最后一个 _ 后面的部分进行判断，如果不是 lang，则认为是基础文件
         
-        if filename != "README.md":
+        last_part = filename.split("_")[-1][:-3]
+        if last_part in target_lang.keys():
             continue
+        basic_part = filename[:-3]
 
         if filename in exclude_list:
             continue
@@ -175,7 +180,7 @@ try:
         md_content = re.sub(marker_skip_lang, "", md_content)
 
         for lang, _ in target_lang.items():
-            target_file = os.path.join(filedir, "README_" + lang + ".md" )
+            target_file = os.path.join(filedir, basic_part + "_" + lang + ".md" )
             if target_file in file_list \
                 and not force_translate \
                     and not update_content:
@@ -187,7 +192,7 @@ try:
             print(f"Translating into {lang}: {input_file}")
             sys.stdout.flush()
             output_content = translate_file(input_file, lang)
-            output_content = output_content.replace("README.md", "README_" + lang + ".md")
+            output_content = output_content.replace("README.md", basic_part + "_" + + lang + ".md")
             with open(target_file, "w", encoding="utf-8") as f:
                 f.write(output_content)
 
