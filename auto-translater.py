@@ -10,9 +10,9 @@ client = openai.OpenAI(
     api_key=os.environ.get("CHATGPT_API_KEY"),
     # base_url=os.environ.get("CHATGPT_API_BASE")
 )
-
-# 即使在已处理的列表中，仍需要重新翻译的标记
-marker_force_translate = "\n[translate]\n"
+marker_force_translate = "[translate]"
+marker_update_content = "[update]"
+marker_skip_lang = r"\[skip_lang\[(.*?)\]\]"
 
 def translate_text(paragraths, lang):
     target_promote = target_lang[lang]
@@ -136,7 +136,6 @@ sorted_file_list = sorted(file_list, key=lambda x: x.lower())
 
 
 try:
-
     # 遍历目录下的所有.md 文件，并进行翻译
     for input_file in sorted_file_list:
         
@@ -153,17 +152,37 @@ try:
         with open(input_file, "r", encoding="utf-8") as f:
             md_content = f.read()
 
+        force_translate = marker_force_translate in md_content
+        update_content = marker_update_content in md_content
+        md_content = md_content.replace(marker_force_translate, "") \
+            .replace(marker_update_content, "")
+        
+        # 检查是否有指定跳过翻译的语言
+        skip_lang_match = re.search(marker_skip_lang, md_content)
+        skip_lang = skip_lang_match.group(1) if skip_lang_match else []
+        md_content = re.sub(marker_skip_lang, "", md_content)
+
         for lang, _ in target_lang.items():
             target_file = os.path.join(filedir, "README_" + lang + ".md" )
-            if target_file in file_list and marker_force_translate not in md_content:
+            if target_file in file_list \
+                and not force_translate \
+                    and not update_content:
+                continue
+
+            if lang in skip_lang:
                 continue
 
             print(f"Translating into {lang}: {input_file}")
             sys.stdout.flush()
             output_content = translate_file(input_file, lang)
-                # 写入输出文件
+            output_content = output_content.replace("README.md", "README_" + lang + ".md")
             with open(target_file, "w", encoding="utf-8") as f:
                 f.write(output_content)
+
+        if force_translate or update_content:
+            with open(input_file, "w", encoding="utf-8") as f:
+                f.write(md_content)
+            
 
         sys.stdout.flush()
         
