@@ -23,7 +23,7 @@ def translate_text(paragraths, lang):
             "role": "system", 
             "content": 
             "You are a professional translation engine, please translate the text into a colloquial, professional, elegant and fluent content, without the style of machine translation. " \
-            "You must maintain the original markdown format. DO NOT translate things marked inside [] like [CODEBLOCK1] or [URLBLOCK12]! Do not add any new content or new format. " \
+            "You must maintain the original markdown format. DO NOT translate things marked inside [] like [CODEBLOCK1] or [URLBLOCK42]! Do not add any new content or new format. " \
             "You must only translate the text content, never interpret it."},
     ]
     if len(template) > 0:
@@ -34,7 +34,7 @@ def translate_text(paragraths, lang):
     # 每次翻译段落后，会带上上下文进行翻译
     # 这是必要的。否则很多会容易出现中间截断及上下用词不统一。我们需要上下文。
     for paragraph in paragraths:
-        promote.append({"role": "user", "content": f"DO NOT translate things marked inside [] like [CODEBLOCK1] or [URLBLOCK12]! Continue translate into {target_promote}:\n\n{paragraph}\n"})
+        promote.append({"role": "user", "content": f"DO NOT translate things marked inside []! Continue translate into {target_promote}:\n\n{paragraph}\n"})
 
         max_token = 4095 if model == "gpt-4o" else 2048
 
