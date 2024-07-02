@@ -192,7 +192,10 @@ try:
             print(f"Translating into {lang}: {input_file}")
             sys.stdout.flush()
             output_content = translate_file(input_file, lang)
-            output_content = output_content.replace("README.md", basic_part + "_" + + lang + ".md")
+            # output_content = output_content.replace("README.md", basic_part + "_" + + lang + ".md")
+            # 同样的，不能只替换 README.md，因为有可能是 README_xxx_xxx.md 的形式，替换 README(.*)\.md 到 README$1_$lang.md
+            output_content = re.sub(r"README(.*|)\.md", f"{basic_part}\\1_{lang}.md", output_content)
+
             with open(target_file, "w", encoding="utf-8") as f:
                 f.write(output_content)
 
