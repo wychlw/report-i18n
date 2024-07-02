@@ -4,6 +4,7 @@ import openai
 import sys
 import re
 import env
+import urlextract
 from conf import *
 
 client = openai.OpenAI(
@@ -22,7 +23,7 @@ def translate_text(paragraths, lang):
             "role": "system", 
             "content": 
             "You are a professional translation engine, please translate the text into a colloquial, professional, elegant and fluent content, without the style of machine translation. " \
-            "You must maintain the original markdown format. Do not translate things marked with [CODEBLOCK]. Do not add any new content or new format. " \
+            "You must maintain the original markdown format. DO NOT translate things marked inside [] like [CODEBLOCK1] or [URLBLOCK12]! Do not add any new content or new format. " \
             "You must only translate the text content, never interpret it."},
     ]
     if len(template) > 0:
@@ -33,7 +34,7 @@ def translate_text(paragraths, lang):
     # 每次翻译段落后，会带上上下文进行翻译
     # 这是必要的。否则很多会容易出现中间截断及上下用词不统一。我们需要上下文。
     for paragraph in paragraths:
-        promote.append({"role": "user", "content": f"Continue translate into {target_promote}:\n\n{paragraph}\n"})
+        promote.append({"role": "user", "content": f"DO NOT translate things marked inside [] like [CODEBLOCK1] or [URLBLOCK12]! Continue translate into {target_promote}:\n\n{paragraph}\n"})
 
         max_token = 4095 if model == "gpt-4o" else 2048
 
@@ -108,6 +109,14 @@ def translate_file(input_file, lang):
         code_blocks.append(code_block)
         input_text = input_text.replace(code_block, f"[CODEBLOCK[{idx}]]")
 
+
+    url_blocks = []
+    url_extractor = urlextract.URLExtract()
+    urls = url_extractor.find_urls(input_text)
+    for idx, url in enumerate(urls):
+        url_blocks.append(url)
+        input_text = input_text.replace(url, f"[URLBLOCK[{idx}]]")
+
     translation_paragraphs = split_text(input_text, max_length)
 
     # 翻译每个段落
@@ -117,6 +126,9 @@ def translate_file(input_file, lang):
     # 将抽出的代码块重新插入到翻译后的文本中
     for idx, code_block in enumerate(code_blocks):
         output_text = output_text.replace(f"[CODEBLOCK[{idx}]]", code_block)
+    
+    for idx, url in enumerate(url_blocks):
+        output_text = output_text.replace(f"[URLBLOCK[{idx}]]", url)
 
     # 加入由 ChatGPT 翻译的提示
     output_text = output_text + tips_translated_by_chatgpt[lang]
