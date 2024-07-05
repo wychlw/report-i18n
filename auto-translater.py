@@ -9,7 +9,7 @@ from conf import *
 
 client = openai.OpenAI(
     api_key=os.environ.get("CHATGPT_API_KEY"),
-    # base_url=os.environ.get("CHATGPT_API_BASE")
+    base_url=os.environ.get("CHATGPT_API_BASE")
 )
 marker_force_translate = "[translate]"
 marker_update_content = "[update]"
